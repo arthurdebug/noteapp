@@ -10,6 +10,7 @@
 // In-built Node Modules (filesystem and path)
 const fs = require("fs");
 const path = require("path");
+
 // NPM installed modules
 // Set up your application, import the required packages
 // Capitalize when it is a class
@@ -21,6 +22,12 @@ const path = require("path");
 // Look at the example from the lecture: https://xccelerate.talentlms.com/unit/view/id:2002
 const express = require("express");
 const app = express();
+//add dotenv for loading db
+require("dotenv").config();
+const config= require("./config.json")["development"]
+const knexConfig = require("./knexfile").development;
+const knex = require("knex")(knexConfig);
+
 // Set up Express
 const bodyParser = require("body-parser");
 // Set up any middleware required, like body-parser
@@ -31,6 +38,10 @@ const AuthChallenger = require("./AuthChallenger");
 
 
 const config = require("./stores/config.json")["development"]; // We use all the development paths
+
+//set up knex to connect database
+
+
 app.engine("handlebars", handlebars({ defaultLayout: "main" }));
 app.set("view engine", "handlebars");
 app.use(express.static("public"));
@@ -39,9 +50,8 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.use(
   basicAuth({
-    authorizer: AuthChallenger(
-      JSON.parse(fs.readFileSync(path.join(__dirname, config.users)))
-    ),
+    authorizer: AuthChallenger,
+    authorizeAsync:true,
     challenge: true,
     realm: "Note Taking Application",
   })
@@ -58,6 +68,7 @@ app.use(
 /*  ====================== */
 // 3) Past in the file into the noteservice class
 const NoteService = require("./Services/NoteService");
+const noteService = new NoteService(knex);
 const NoteRouter = require("./Routers/NoteRouter");
 /** # Set up basic express server  #
 /*  ====================== */
