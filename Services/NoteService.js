@@ -15,7 +15,7 @@ class NoteService {
       await this.knex
         .insert({
           note: info,
-          user_id: query[0].id,
+          users_id: query[0].id,
         })
         .into("notes");
     } else {
@@ -28,7 +28,7 @@ class NoteService {
       let query = this.knex
         .select("notes.id", "notes.note")
         .from("notes")
-        .innerJoin("users", "notes.user_id", "users.id")
+        .innerJoin("users", "notes.users_id", "users.id")
         .where("users.user_name", user)
         .orderBy("notes.id", "asc");
 
@@ -43,7 +43,7 @@ class NoteService {
       let query = this.knex
         .select("users.user_name", "notes.id", "note")
         .from("notes")
-        .innerJoin("users", "notes.user_id", "users.id");
+        .innerJoin("users", "notes.users_id", "users.id");
 
       return query.then((rows) => {
         console.log(rows);

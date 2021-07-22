@@ -3,7 +3,7 @@ const express = require("express");
 const handlebars = require("express-handlebars");
 const basicAuth = require("express-basic-auth");
 const bodyParser = require("body-parser");
-
+const fs = require("fs");
 // Set up express and environment
 const app = express();
 require("dotenv").config();

@@ -1,20 +1,19 @@
 var notesTemplate = Handlebars.compile(
   `
-    {{#each notes}}
-    <div class="note">
-        <span class="input"><textarea data-horse="pony" data-id="{{ @index }}"> {{ this }}</textarea></span>
-        <button class="remove btn btn-xs" data-id="{{ @index }}"><i class = "fa fa-trash" aria-hidden="true"></i></button>
-        </div>
-        {{/each}}
-    `
-);
+      {{#each notes}}
+      <div class="note">
+          <span class="input"><textarea id={{ id }}>{{ this.note }}</textarea></span>
+          <button class="remove btn btn-xs" data-id="{{ id }}"><i class = "fa fa-trash" aria-hidden="true"></i></button>
+          </div>
+          {{/each}}
+      `
+  );
 
 // This function is responsible of re-rendering the page every time we update our notes. It recieves the array of notes and then forces each note (each element within the array) into the notes template, which iterates through the array rendering all the notes to the DOM in the same format.
 const reloadNotes = (data) => {
   console.log("RELOADING");
   console.log(data);
-  console.log(8);
-  $("#notes").html(notesTemplate({ notes: res.data, }));
+  $("#notes").html(notesTemplate({ notes: data, }));
 };
 
 // This function is used and defined to make a message appear on the dom when saving our note.
@@ -48,7 +47,7 @@ $(() => {
     console.log("add pressed");
     console.log(1);
 
-    var val = $("textarea[name=note]").val();
+    var val = $("textarea[name=note]").val("");
     console.log(val);
     if (val === "") {
       return;
@@ -60,23 +59,20 @@ $(() => {
       })
       .then((res) => {
         // window.location.reload();
-        console.log(res);
         console.log(res.data);
-        console.log(7);
         reloadNotes(res.data);
       })
       .catch((err) => {
         console.log(err);
-        window.location.reload();
+        //window.location.reload();
       });
   });
 
   // Add an event listener to our div (it has an id of notes) which encapsulates our text-areas, we specify we are targeting the text areas. When we blur (lose focus on the text area), we begin saving our new note (make the message appear on the DOM)
   $("#notes").on("blur", "textarea", (event) => {
     beginSaving(event.currentTarget);
-    console.log($(event.currentTarget).data("horse"));
     console.log($(event.currentTarget).data("id"));
-
+    beginSaving(event.currentTarget);
     // Then we sent out our put request using the data-id property on our targeted text area, we send the value of this text area within the body and we end the saving message on the dom. We then reload all of our notes with updated information we received from our server.
     axios
       .put("/api/notes/" + $(event.currentTarget).data("id"), {
