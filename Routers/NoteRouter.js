@@ -29,14 +29,13 @@ class NoteRouter {
   //   when the route is "/"
   //   Here we handle what will occur when we have been sent down a particular path, this path is '/' - we will just list all of the notes, that match our(req.auth.user)
   get(req, res) {
-    let user = req.auth.user;
     return (
       this.noteService
         // list out all the notes from the user
         .list(req.auth.user)
         // What we do with the information that we receive, here we send the notes back in JSON format.
         .then((notes) => {
-          console.log(req.auth.user);
+          console.log("Getting");
           console.log(notes);
           res.json(notes);
         }) 
@@ -50,24 +49,17 @@ class NoteRouter {
   // 2) Create a post method
   post(req, res) {
     console.log("NoteRouter: POST Method");
-    console.log("Note: " + req.body.note);
-    console.log("User: " + req.auth.user);
-    return (
-      this.noteService
+    //console.log("Note: " + req.body.note);
+    //console.log("User: " + req.auth.user);
+    return this.noteService
         // call the add method here
-       .add(req.body.note, req.auth.user).then(() => {
-          console.log("running");
-          console.log(req.auth.user);
-          return this.noteService
-            .list(req.auth.user)
-            .then((notes) => {
-              return res.json(notes);
-            })
+       .add(req.body.note, req.auth.user)
+       .then(() => this.noteService.list(req.auth.user))
+            .then((notes) => res.json(notes))
             .catch((err) => {
               res.status(500).json(err);
             });
-        })
-    )
+   
   }
 
   /** # PUT Method   #
@@ -75,16 +67,16 @@ class NoteRouter {
   // 3) Create a put method, which updates our json file
   // Here we handle our put request, which has an id as a parameter (req.params.id), the body of the updated note (req.body.note) and the user who's note we want to update (req.auth.user)
   put(req, res) {
-    let id = req.params.id;
-    let note = req.body.note;
-    let user = req.auth.user;
+    //let id = req.params.id;
+    //let note = req.body.note;
+    //let user = req.auth.user;
     //return this.noteService;
     return (
       this.noteService
         // The noteService fires the update command, this will update our note (and our JSON file)
         .update(req.params.id, req.body.note, req.auth.user)
         // Then we fire list note from the same noteService which returns the array of notes for that user.
-        .then(() => this.noteService.list(req.auth.user))
+        .then(() => this.NoteService.list(req.auth.user))
         // Then we respond to the request with all of our notes in the JSON format back to our clients browser.
         .then((notes) => res.json(notes))
         // Catch error if need be
@@ -101,7 +93,7 @@ class NoteRouter {
         // first remove the note
         .remove(req.params.id, req.auth.user)
         // list it out
-        .then(()=> this.noteService.list(req.auth.user))
+        .then(()=> this.NoteService.list(req.auth.user))
         // format it into json
         .then((notes)=>res.json(notes))
         .catch((err)=> res.status(500).json(err))

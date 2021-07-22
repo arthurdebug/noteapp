@@ -3,18 +3,18 @@ class NoteService {
     this.knex = knex;
   }
 
-  async add(note, user) {
+  async add(info, user) {
     let query = await this.knex
       .select("id")
-      .from("user")
-      .where("user.user_name", user);
+      .from("users")
+      .where("users.user_name", user);
 
     console.log(query);
 
     if (query.length === 1) {
       await this.knex
         .insert({
-          content: note,
+          note: info,
           user_id: query[0].id,
         })
         .into("notes");
@@ -28,22 +28,22 @@ class NoteService {
       let query = this.knex
         .select("notes.id", "notes.note")
         .from("notes")
-        .innerJoin("user", "notes.user_id", "user.id")
-        .where("user.user_name", user)
+        .innerJoin("users", "notes.user_id", "users.id")
+        .where("users.user_name", user)
         .orderBy("notes.id", "asc");
 
       return query.then((rows) => {
         console.log(rows, "pp");
         return rows.map((row) => ({
           id: row.id,
-          content: row.note,
+          note: row.note,
         }));
       });
     } else {
       let query = this.knex
-        .select("user.user_name", "notes.id", "note")
+        .select("users.user_name", "notes.id", "note")
         .from("notes")
-        .innerJoin("user", "notes.user_id", "user.id");
+        .innerJoin("users", "notes.user_id", "users.id");
 
       return query.then((rows) => {
         console.log(rows);
@@ -54,23 +54,23 @@ class NoteService {
           }
           result[row.user_name].push({
             id: row.id,
-            content: row.note,
+            note: row.note,
           });
         });
         return result;
       });
     }
   }
-  update(id, note, user) {
+  update(id, info, user) {
     let query = this.knex
       .select("id")
-      .from("user")
-      .where("user.user_name", user);
+      .from("users")
+      .where("users.user_name", user);
 
     return query.then((rows) => {
       if (rows.length === 1) {
         return this.knex("notes").where("id", id).update({
-          content: note,
+          note: info,
         });
       } else {
         throw new Error(`Cannot update a note if the user doesn't exist!`);
@@ -80,8 +80,8 @@ class NoteService {
   remove(id, user) {
     let query = this.knex
       .select("id")
-      .from("user")
-      .where("user.user_name", user);
+      .from("users")
+      .where("users.user_name", user);
 
     return query.then((rows) => {
       if (rows.length === 1) {

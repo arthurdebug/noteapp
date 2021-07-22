@@ -10,11 +10,11 @@ var notesTemplate = Handlebars.compile(
 );
 
 // This function is responsible of re-rendering the page every time we update our notes. It recieves the array of notes and then forces each note (each element within the array) into the notes template, which iterates through the array rendering all the notes to the DOM in the same format.
-const reloadNotes = (notes) => {
+const reloadNotes = (data) => {
   console.log("RELOADING");
-  console.log(notes);
+  console.log(data);
   console.log(8);
-  $("#notes").html(notesTemplate({ notes: notes }));
+  $("#notes").html(notesTemplate({ notes: res.data, }));
 };
 
 // This function is used and defined to make a message appear on the dom when saving our note.
@@ -32,15 +32,15 @@ const endSaving = (target) => {
 // Document on ready function, when the document has fully loaded we can do everything within this block of code.
 $(() => {
   // Initial get request from our client to our server, we are trying to get all of our notes for the user currently logged in, so we can render each note onto the DOM.
-  // axios
-  //   .get("/api/notes/")
-  //   .then((res) => {
-  //     console.log(`Getting notes: ${res.data}`);
-  //     reloadNotes(res.data);
-  //   })
-  //   .catch((err) => {
-  //     console.log(err);
-  //   });
+   axios
+     .get("/api/notes/")
+     .then((res) => {
+       console.log(`Getting notes: ${res.data}`);
+       reloadNotes(res.data);
+     })
+     .catch((err) => {
+       console.log(err);
+     });
 
   // Add an event listener on the add button, such then when we press the button we grab the value from our text box and then send that value to our server in our post request, then we receive the new data from our server and reload all of our notes.
   $("#add").submit((e) => {
@@ -55,7 +55,7 @@ $(() => {
     }
     $("textarea[name=note]").val("");
     axios
-      .post("/api/info/", {
+      .post("/api/notes/", {
         note: val,
       })
       .then((res) => {
@@ -79,7 +79,7 @@ $(() => {
 
     // Then we sent out our put request using the data-id property on our targeted text area, we send the value of this text area within the body and we end the saving message on the dom. We then reload all of our notes with updated information we received from our server.
     axios
-      .put("/api/info/" + $(event.currentTarget).data("id"), {
+      .put("/api/notes/" + $(event.currentTarget).data("id"), {
         note: $(event.currentTarget).val(),
       })
       .then((res) => {
@@ -98,7 +98,7 @@ $(() => {
     // Below we send out delete request using the data-id property on our targeted text area/ button
     console.log($(event.currentTarget).data("id"));
     axios
-      .delete("/api/info/" + $(event.currentTarget).data("id"))
+      .delete("/api/notes/" + $(event.currentTarget).data("id"))
       .then((res) => {
         endSaving(event.currentTarget); // remove saving message from the DOM
         reloadNotes(res.data); // reload the notes on the DOM so that we only render the updated notes
