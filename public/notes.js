@@ -2,7 +2,7 @@ var notesTemplate = Handlebars.compile(
   `
       {{#each notes}}
       <div class="note">
-          <span class="input"><textarea id={{ id }}>{{ this.note }}</textarea></span>
+          <span class="input"><textarea id={{ id }}>{{ note }}</textarea></span>
           <button class="remove btn btn-xs" data-id="{{ id }}"><i class = "fa fa-trash" aria-hidden="true"></i></button>
           </div>
           {{/each}}
@@ -47,18 +47,18 @@ $(() => {
     console.log("add pressed");
     console.log(1);
 
-    var val = $("textarea[name=note]").val("");
+    var val = $("textarea[name=note]").val();
     console.log(val);
     if (val === "") {
       return;
     }
-    $("textarea[name=note]").val("");
+    $("textarea[name=note]").val();
     axios
       .post("/api/notes/", {
         note: val,
       })
       .then((res) => {
-        // window.location.reload();
+        //window.location.reload();
         console.log(res.data);
         reloadNotes(res.data);
       })
@@ -93,6 +93,7 @@ $(() => {
     beginSaving(event.currentTarget); // show saving message on DOM
     // Below we send out delete request using the data-id property on our targeted text area/ button
     console.log($(event.currentTarget).data("id"));
+    window.location.reload();
     axios
       .delete("/api/notes/" + $(event.currentTarget).data("id"))
       .then((res) => {

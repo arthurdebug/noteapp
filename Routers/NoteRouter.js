@@ -29,8 +29,7 @@ class NoteRouter {
   //   when the route is "/"
   //   Here we handle what will occur when we have been sent down a particular path, this path is '/' - we will just list all of the notes, that match our(req.auth.user)
   get(req, res) {
-    return (
-      this.noteService
+    return this.noteService
         // list out all the notes from the user
         .list(req.auth.user)
         // What we do with the information that we receive, here we send the notes back in JSON format.
@@ -41,7 +40,7 @@ class NoteRouter {
         }) 
         // This .catch is to handle any errors that may befall our project.
         .catch((err) => res.status(500).json(err))
-        )
+        
   }
 
   /** # Post Method   #
@@ -49,8 +48,8 @@ class NoteRouter {
   // 2) Create a post method
   post(req, res) {
     console.log("NoteRouter: POST Method");
-    //console.log("Note: " + req.body.note);
-    //console.log("User: " + req.auth.user);
+    console.log("Note: " + req.body.note);
+    console.log("User: " + req.auth.user);
     return this.noteService
         // call the add method here
        .add(req.body.note, req.auth.user)
@@ -71,8 +70,7 @@ class NoteRouter {
     //let note = req.body.note;
     //let user = req.auth.user;
     //return this.noteService;
-    return (
-      this.noteService
+    return this.noteService
         // The noteService fires the update command, this will update our note (and our JSON file)
         .update(req.params.id, req.body.note, req.auth.user)
         // Then we fire list note from the same noteService which returns the array of notes for that user.
@@ -81,15 +79,14 @@ class NoteRouter {
         .then((notes) => res.json(notes))
         // Catch error if need be
         .catch((err) => res.status(500).json(err))
-    );
+
   }
   /** # DELETE Method   #
   /*  ====================== */
   // 4) Create a delete method
 
   delete(req, res) {
-    return (
-      this.noteService
+    return this.noteService
         // first remove the note
         .remove(req.params.id, req.auth.user)
         // list it out
@@ -97,7 +94,6 @@ class NoteRouter {
         // format it into json
         .then((notes)=>res.json(notes))
         .catch((err)=> res.status(500).json(err))
-    );
   }
 }
 
